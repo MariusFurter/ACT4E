@@ -201,41 +201,43 @@ jobs:
             git config --global user.email "acensi@ethz.ch"
             git config --global user.name "ci-build"
       
-      - run:
-          name: update git 
-          command: |
-            apt-get install -y software-properties-common
-            add-apt-repository -y ppa:git-core/ppa
-            apt-get update 
-            apt-get install git -y
+      # - run:
+      #     name: update git 
+      #     command: |
+      #       apt-get install -y software-properties-common
+      #       add-apt-repository -y ppa:git-core/ppa
+      #       apt-get update 
+      #       apt-get install git -y
 
       - run:
           name: install git lfs
           command: |
-            curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash
+            # curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash
+            apt-get update 
             apt-get install git-lfs -y
             git lfs install
       - run:
           name: Install and configure dependencies
           command: |
-            npm install -g --unsafe-perm=true netlify-cli
+            npm install -g --unsafe-perm=true netlify-cli@3.8.3
       
       - run:
           name: netlify
           command: |
             netlify login
-            netlify status
+            netlify status || true
 
       - run:
           name: install lm
           command: |
-            netlify lm:install
+            SHELL=bash netlify lm:install
+            source /root/.config/netlify/helper/path.bash.inc
             netlify lm:info
 
       - run:
           name: Deploy docs to gh-pages branch
           command: |
-            GIT_LFS_SKIP_SMUDGE=1 git clone --depth 1 -b master git@github.com:idsc-frazzoli/ACT4E-target.git docs
+            GIT_LFS_SKIP_SMUDGE=1 git clone -b master git@github.com:idsc-frazzoli/ACT4E-target.git docs
 
             cd docs && netlify link --name=act4e-spring21
 
