@@ -195,14 +195,17 @@ jobs:
       - checkout
       - attach_workspace:
           at: tmp/workspace
-      # - run:
-      #     name: Install and configure dependencies
-      #     command: |
-      #       npm install -g --silent gh-pages@2.0.1
-      #       git config --global user.email "acensi@ethz.ch"
-      #       git config --global  user.name "ci-build"
       - run:
-          name: git lfs
+          name: Install and configure dependencies
+          command: |
+            npm install -g --silent gh-pages@2.0.1 netlify
+      - run:
+          name: Config git
+          command: |
+            git config --global user.email "acensi@ethz.ch"
+            git config --global user.name "ci-build"
+      - run:
+          name: install git lfs
           command: |
             curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash
             apt-get install git-lfs -y
@@ -218,3 +221,5 @@ jobs:
             git -C docs add .
             git -C docs commit -a -m "update [ci skip]"
             git -C docs push
+
+            cd docs && netlify deploy --prod 
